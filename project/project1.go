@@ -1,6 +1,7 @@
 package project
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"math/rand"
@@ -48,11 +49,44 @@ window.history.back(-1);
 },1000);
 
 </script>
+
+
+
     <body>
           Submit Success
     </body>
 </html>`,
 	)
+}
+
+type Response struct {
+	Name string
+	Age  string
+}
+
+func postData(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set(
+		"Content-Type",
+		"application/json",
+	)
+	fmt.Println("===", req.Header.Values("Content-Type"))
+	// Declare a new Person struct.
+	var rp Response
+
+	// Try to decode the request body into the struct. If there is an error,
+	// respond to the client with the error message and a 400 status code.
+	err := json.NewDecoder(req.Body).Decode(&rp)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(res, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Do something with the Person struct...
+	//fmt.Fprintf(res, "%+v", rp)
+
+	io.WriteString(res, "{\"code\":0,\"msg\":\"success\"}")
+
 }
 
 //<h1 style="background-color:DodgerBlue;">Hello World</h1>
@@ -69,6 +103,41 @@ func ztfunc(res http.ResponseWriter, req *http.Request) {
 		`
 <!DOCTYPE html>
 <html>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+  $("button").click(function(){
+    //$.post("/postdata",
+    //{
+    //  name: "Donald Duck",
+    //  age: "Duckburg"
+    //},
+    //function(data,status){
+    //  alert("Data: " + data + "\nStatus: " + status);
+    //},
+    //'application/json; charset=utf-8'
+    // );
+
+     $.ajax({
+            type: "POST",
+            url: "/postdata",
+            async: false,
+            data: JSON.stringify({ Name: "Donald Duck", Age: "18" }),
+            contentType: "application/json",
+            complete: function (data) {
+				console.log(data.responseJSON);
+				alert(JSON.stringify(data.responseJSON));
+            
+        }
+     });
+
+  });
+});
+</script>
+
+
 <body>
 
 <h2>Project 1</h2>
@@ -85,6 +154,9 @@ func ztfunc(res http.ResponseWriter, req *http.Request) {
 
 <p>If you click the "Submit" button, the form-data will be sent to a page called "/hello".</p>
 
+
+<button>POST request</button>
+
 </body>
 </html>
 
@@ -92,6 +164,7 @@ func ztfunc(res http.ResponseWriter, req *http.Request) {
 	)
 }
 func Project1() {
+	http.HandleFunc("/postdata", postData)
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/", ztfunc)
 	fmt.Println("start server: http://127.0.0.1:9000")
