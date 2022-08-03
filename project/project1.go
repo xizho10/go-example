@@ -1,6 +1,7 @@
 package project
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -22,6 +24,31 @@ func writeLog(title string, note string, link string) {
 
 	str := strconv.Itoa(rand.Intn(100)) + "," + title + "," + time.Now().Format("2006-01-02 15:03:04") + "," + note + "," + link
 	file.WriteString(str + "\r\n")
+}
+
+func readLog(id string) string {
+	filePath := "./project/project1.csv"
+	file, err := os.Open(filePath)
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+		return ""
+	}
+	defer file.Close()
+
+	br := bufio.NewReader(file)
+	fmt.Println(id)
+	for {
+		a, _, c := br.ReadLine()
+		if c == io.EOF {
+			break
+		}
+		fmt.Println(string(a))
+		strArr := strings.Split(string(a), ",")
+		if strArr[0] == id {
+			return string(a)
+		}
+	}
+	return ""
 }
 
 func hello(res http.ResponseWriter, req *http.Request) {
@@ -59,9 +86,15 @@ window.history.back(-1);
 	)
 }
 
-type Response struct {
+type RequestData struct {
 	Name string
-	Age  string
+	Id   string
+}
+
+type Response struct {
+	Code   int
+	Msg    string
+	Result interface{}
 }
 
 func postData(res http.ResponseWriter, req *http.Request) {
@@ -71,7 +104,7 @@ func postData(res http.ResponseWriter, req *http.Request) {
 	)
 	fmt.Println("===", req.Header.Values("Content-Type"))
 	// Declare a new Person struct.
-	var rp Response
+	var rp RequestData
 
 	// Try to decode the request body into the struct. If there is an error,
 	// respond to the client with the error message and a 400 status code.
@@ -83,9 +116,17 @@ func postData(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// Do something with the Person struct...
-	//fmt.Fprintf(res, "%+v", rp)
+	//fmt.Fprintf(res, "%+
+	fmt.Println(rp)
 
-	io.WriteString(res, "{\"code\":0,\"msg\":\"success\"}")
+	resData := Response{
+		Code:   0,
+		Msg:    "success",
+		Result: readLog(rp.Id),
+	}
+	data, _ := json.Marshal(resData)
+
+	io.WriteString(res, string(data))
 
 }
 
@@ -120,11 +161,12 @@ $(document).ready(function(){
     //'application/json; charset=utf-8'
     // );
 
+     var eleValue = document.getElementById("element").value;
      $.ajax({
             type: "POST",
             url: "/postdata",
             async: false,
-            data: JSON.stringify({ Name: "Donald Duck", Age: "18" }),
+            data: JSON.stringify({ Name: "Donald Duck", Id: eleValue }),
             contentType: "application/json",
             complete: function (data) {
 				console.log(data.responseJSON);
@@ -154,8 +196,9 @@ $(document).ready(function(){
 
 <p>If you click the "Submit" button, the form-data will be sent to a page called "/hello".</p>
 
-
-<button>POST request</button>
+<label >Log Id:</label>
+<input id="element" className="element" name="element" />
+<button>Get Log</button>
 
 </body>
 </html>
