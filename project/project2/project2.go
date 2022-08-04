@@ -1,4 +1,4 @@
-package project
+package project2
 
 import (
 	"example/project/project2/storage"
@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-func Project2() {
-	var stor = &storage.LocalFile{}
+func Start() {
+	var stor = &storage.Sqlite{}
 	router := Router{storage: stor}
 	http.HandleFunc("/", router.Index)
 	http.HandleFunc("/getlog", router.GetLog)

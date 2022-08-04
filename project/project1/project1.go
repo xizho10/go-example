@@ -1,4 +1,4 @@
-package project
+package project1
 
 import (
 	"bufio"
@@ -329,7 +329,7 @@ $(document).ready(function(){
 	)
 }
 
-func Project1() {
+func Start() {
 	http.HandleFunc("/getlog", getLog)
 	http.HandleFunc("/addlog", addLog)
 	http.HandleFunc("/updatelog", updateLog)

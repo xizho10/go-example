@@ -28,7 +28,7 @@ func (l *LocalFile) WriteLog(title string, note string, link string) {
 	str := strconv.Itoa(rand.Intn(100)) + "," + title + "," + time.Now().Format("2006-01-02 15:03:04") + "," + note + "," + link
 	file.WriteString(str + "\r\n")
 }
-func (l *LocalFile) ReadLog(id string) string {
+func (l *LocalFile) ReadLog(id string) interface{} {
 
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -52,7 +52,7 @@ func (l *LocalFile) ReadLog(id string) string {
 	}
 	return ""
 }
-func (l *LocalFile) ChangeLog(id string, title string) string {
+func (l *LocalFile) ChangeLog(id string, title string) interface{} {
 
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
