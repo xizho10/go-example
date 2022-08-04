@@ -13,8 +13,9 @@ import (
 	"time"
 )
 
+const filePath = "./project/project1/project1.csv"
+
 func writeLog(title string, note string, link string) {
-	filePath := "./project/project1.csv"
 	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
 	if err != nil {
 		return
@@ -27,7 +28,6 @@ func writeLog(title string, note string, link string) {
 }
 
 func readLog(id string) string {
-	filePath := "./project/project1.csv"
 	file, err := os.Open(filePath)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
@@ -52,7 +52,6 @@ func readLog(id string) string {
 }
 
 func changeLog(id string, title string) string {
-	filePath := "./project/project1.csv"
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)

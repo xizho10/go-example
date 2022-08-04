@@ -2,14 +2,15 @@ package main
 
 import (
 	"example/chapter4"
-	"example/project"
+	"example/project/project2"
 	"fmt"
 )
 
 func main() {
 	fmt.Println("hello zhengtang")
 	if true {
-		project.Project1()
+		//project.Project1()
+		project.Project2()
 		//chapter13.Chapter13main9()
 		//chapter3.Chap3main()
 	}
